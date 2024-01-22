@@ -4,6 +4,8 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
@@ -12,7 +14,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     }
     SessionFactory factory = Util.getSessionFactory();
-
+    Transaction transaction;
     @Override
     public void createUsersTable() {
         String sql = "CREATE TABLE IF NOT EXISTS users" +
@@ -42,23 +44,23 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) {
         try (Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
             session.save(new User(name, lastName,age));
             session.getTransaction().commit();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            transaction.rollback();
         }
     }
 
     @Override
     public void removeUserById(long id) {
         try (Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
             User user = session.get(User.class, id);
             session.delete(user);
             session.getTransaction().commit();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            transaction.rollback();
         }
     }
 
@@ -76,11 +78,11 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         try (Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
+            transaction = session.beginTransaction();
             session.createQuery("delete User").executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            transaction.rollback();
         }
     }
 }
