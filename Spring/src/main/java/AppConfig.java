@@ -11,4 +11,9 @@ public class AppConfig {
         helloWorld.setMessage("Hello World!");
         return helloWorld;
     }
+    @Bean
+    @Scope ("prototype")
+    public Cat catBean() {   // bean id является название самого метода, но можно прописать и в @Bean
+        return new Cat();
+    }
 }
