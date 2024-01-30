@@ -11,12 +11,4 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "app")
 public class AppConfig {
 
-    @Bean
-    public Animal dogBean() {
-        return new Dog();
-    }
-    @Bean
-    public AnimalsCage animalCage() {
-        return new AnimalsCage(dogBean());
-    }
 }
